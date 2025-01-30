@@ -18,6 +18,17 @@ pub fn info() -> String {
     config.version
 }
 
+pub fn git_tag() -> String {
+    // Assuming the current git tag is stored in a file named ".git/HEAD"
+    let git_tag_file = std::path::Path::new(".git").join("HEAD");
+    let git_tag_str = std::fs::read_to_string(git_tag_file).expect("Failed to read.git/HEAD");
+
+    // Extract the git tag from the file content
+    let git_tag = git_tag_str.trim_start_matches("ref: refs/heads/");
+
+    git_tag.to_string()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -29,8 +40,15 @@ mod tests {
     }
 
     #[test]
-    fn test_version_is_0_0_0() {
+    fn test_version_is_0_1_0() {
         let version = info();
-        assert_eq!(version, "0.0.0");
+        assert_eq!(version, "0.1.0");
+    }
+
+    #[test]
+    fn test_git_tag_matches_config_version() {
+        let version = info();
+        let git_tag = git_tag();
+        assert_eq!(version, git_tag);
     }
 }
